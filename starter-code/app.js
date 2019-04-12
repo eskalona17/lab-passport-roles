@@ -11,6 +11,10 @@ const path         = require('path');
 
 require('./config/db.config');
 
+const miscRouter = require('./routes/misc.routes');
+const authRouter = require('./routes/auth.routes');
+const usersRouter = require('./routes/users.routes');
+
 const app_name = require('./package.json').name;
 const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
 
@@ -36,15 +40,15 @@ app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
+app.use((req, res, next) => {
+  res.locals.path = req.path;
+  res.locals.session = req.user;
+  next()
+})
 
-
-// default value for title local
-app.locals.title = 'Express - Generated with IronGenerator';
-
-
-
-const index = require('./routes/users.routes');
-app.use('/', index);
+app.use('/', miscRouter);
+app.use('/', authRouter);
+app.use('/users', usersRouter);
 
 
 module.exports = app;
